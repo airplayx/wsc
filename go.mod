@@ -1,4 +1,4 @@
-module github.com/togettoyou/wsc
+module github.com/airplayx/wsc
 
 go 1.14
 

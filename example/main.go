@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/togettoyou/wsc"
+	"github.com/airplayx/wsc"
 	"log"
 	"time"
 )

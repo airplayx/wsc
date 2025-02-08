@@ -1,11 +1,11 @@
 # golang websocket client
-[![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/github.com/togettoyou/wsc)
-[![GoDoc](https://godoc.org/github.com/togettoyou/wsc?status.svg)](https://godoc.org/github.com/togettoyou/wsc)
+[![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/github.com/airplayx/wsc)
+[![GoDoc](https://godoc.org/github.com/airplayx/wsc?status.svg)](https://godoc.org/github.com/airplayx/wsc)
 
 ### Install
 
 ```
-$ go get -v github.com/togettoyou/wsc
+$ go get -v github.com/airplayx/wsc
 ```
 #### Simple example
 
@@ -13,7 +13,7 @@ $ go get -v github.com/togettoyou/wsc
 package main
 
 import (
-	"github.com/togettoyou/wsc"
+	"github.com/airplayx/wsc"
 	"log"
 	"time"
 )
