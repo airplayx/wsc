@@ -79,7 +79,7 @@ type wsMsg struct {
 	msg []byte
 }
 
-// 创建一个Wsc客户端
+// New 创建一个Wsc客户端
 func New(url string) *Wsc {
 	return &Wsc{
 		Config: &Config{
@@ -103,6 +103,10 @@ func New(url string) *Wsc {
 
 func (wsc *Wsc) SetConfig(config *Config) {
 	wsc.Config = config
+}
+
+func (wsc *Wsc) SetWebSocket(ws *WebSocket) {
+	wsc.WebSocket = ws
 }
 
 func (wsc *Wsc) OnConnected(f func()) {
@@ -149,14 +153,14 @@ func (wsc *Wsc) OnBinaryMessageReceived(f func(data []byte)) {
 	wsc.onBinaryMessageReceived = f
 }
 
-// 返回关闭状态
+// Closed 返回关闭状态
 func (wsc *Wsc) Closed() bool {
 	wsc.WebSocket.connMu.RLock()
 	defer wsc.WebSocket.connMu.RUnlock()
 	return !wsc.WebSocket.isConnected
 }
 
-// 发起连接
+// Connect 发起连接
 func (wsc *Wsc) Connect() {
 	wsc.WebSocket.sendChan = make(chan *wsMsg, wsc.Config.MessageBufferSize) // 缓冲
 	b := &backoff.Backoff{
@@ -165,7 +169,7 @@ func (wsc *Wsc) Connect() {
 		Factor: wsc.Config.RecFactor,
 		Jitter: true,
 	}
-	rand.Seed(time.Now().UTC().UnixNano())
+	rand.NewSource(time.Now().UTC().UnixNano())
 	for {
 		var err error
 		nextRec := b.Duration()
@@ -251,7 +255,7 @@ func (wsc *Wsc) Connect() {
 					if !ok {
 						return
 					}
-					err := wsc.send(wsMsg.t, wsMsg.msg)
+					err := wsc.Send(wsMsg.t, wsMsg.msg)
 					if err != nil {
 						if wsc.onSentError != nil {
 							wsc.onSentError(err)
@@ -284,7 +288,7 @@ var (
 	BufferErr = errors.New("message buffer is full")
 )
 
-// 发送TextMessage消息
+// SendTextMessage 发送TextMessage消息
 func (wsc *Wsc) SendTextMessage(message string) error {
 	if wsc.Closed() {
 		return CloseErr
@@ -301,7 +305,7 @@ func (wsc *Wsc) SendTextMessage(message string) error {
 	return nil
 }
 
-// 发送BinaryMessage消息
+// SendBinaryMessage 发送BinaryMessage消息
 func (wsc *Wsc) SendBinaryMessage(data []byte) error {
 	if wsc.Closed() {
 		return CloseErr
@@ -318,8 +322,8 @@ func (wsc *Wsc) SendBinaryMessage(data []byte) error {
 	return nil
 }
 
-// 发送消息到连接端
-func (wsc *Wsc) send(messageType int, data []byte) error {
+// Send 发送自定义消息到连接端
+func (wsc *Wsc) Send(messageType int, data []byte) error {
 	wsc.WebSocket.sendMu.Lock()
 	defer wsc.WebSocket.sendMu.Unlock()
 	if wsc.Closed() {
@@ -341,17 +345,17 @@ func (wsc *Wsc) closeAndRecConn() {
 	go wsc.Connect()
 }
 
-// 主动关闭连接
+// Close 主动关闭连接
 func (wsc *Wsc) Close() {
 	wsc.CloseWithMsg("")
 }
 
-// 主动关闭连接，附带消息
+// CloseWithMsg 主动关闭连接，附带消息
 func (wsc *Wsc) CloseWithMsg(msg string) {
 	if wsc.Closed() {
 		return
 	}
-	_ = wsc.send(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, msg))
+	_ = wsc.Send(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, msg))
 	wsc.clean()
 	if wsc.onClose != nil {
 		wsc.onClose(websocket.CloseNormalClosure, msg)
