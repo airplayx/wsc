@@ -109,6 +109,14 @@ func (wsc *Wsc) SetWebSocket(ws *WebSocket) {
 	wsc.WebSocket = ws
 }
 
+func (wsc *Wsc) SetRequestHeader(requestHeader http.Header) {
+	wsc.WebSocket.RequestHeader = requestHeader
+}
+
+func (wsc *Wsc) SetDialer(dialer *websocket.Dialer) {
+	wsc.WebSocket.Dialer = dialer
+}
+
 func (wsc *Wsc) OnConnected(f func()) {
 	wsc.onConnected = f
 }
